@@ -1,4 +1,4 @@
-# 🚀 ArkeyezDoc v2.0 - AI-Powered Document Classification for ERPNext
+#  ArkeyezDoc v2.0 - AI-Powered Document Classification for ERPNext
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-FF6F00?style=flat&logo=tensorflow)](https://www.tensorflow.org/)
@@ -9,7 +9,7 @@
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Overview](#-overview)
 - [Features](#-features)
@@ -24,7 +24,7 @@
 
 ---
 
-## 🎯 Overview
+##  Overview
 
 **ArkeyezDoc** is an AI system that automatically classifies documents (invoices, technical drawings, reports, receipts) using:
 
@@ -35,7 +35,7 @@
 - **ERPNext Integration**: Direct insertion into ERPNext via REST API
 - **WebSocket Streaming**: Real-time processing tracking
 
-### 📊 Performance
+### Performance
 
 | Metric | Value |
 |--------|-------|
@@ -46,9 +46,9 @@
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔥 Core Features
+###  Core Features
 
 - ✅ **Multi-document Classification**: Batch processing (multi-page PDF supported)
 - ✅ **CNN+OCR Fusion**: Confidence boost up to +8% through textual analysis
@@ -68,7 +68,7 @@
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -94,7 +94,7 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 📦 Components
+###  Components
 
 | Component | Technology | Role |
 |-----------|------------|------|
