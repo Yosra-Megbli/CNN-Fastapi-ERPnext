@@ -1,0 +1,28 @@
+# Python
+env/
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Models (si trop volumineux)
+models/*.h5
+models/*.pkl
+models/*.pth
+
+# Database
+*.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

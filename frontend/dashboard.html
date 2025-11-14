@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArkeyzDoc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes slide-in {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-in {
+            animation: slide-in 0.4s ease-out;
+        }
+        .glassmorphism-light {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+        .result-card {
+            transition: all 0.3s ease;
+        }
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="m-0 p-0">
+    <div id="app"></div>
+
+    <script type="module">
+        const API_URL = 'http://localhost:8000';
+
+        let state = {
+            token: null,
+            username: '',
+            password: '',
+            modelStatus: { loaded: false, progress: 0, mode: 'simulation', data: null, showModal: false },
+            uploadedFiles: [],
+            imagePreviews: [],
+            classificationResults: null,
+            isClassifying: false,
+            notification: null,
+            notificationShown: false,
+            insertingIndex: null,
+            insertingAll: false
+        };
+
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = state.token ? renderDashboard() : renderLogin();
+            attachEventListeners();
+        }
+
+        function renderLogin() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-purple-300 via-pink-200 to-orange-200 flex items-center justify-center p-4">
+                    <div class="glassmorphism-light rounded-3xl p-8 shadow-2xl max-w-md w-full">
+                        <div class="text-center mb-8">
+                            <h1 class="text-4xl font-bold text-purple-700 mb-2">ArkeyzDoc</h1>
+                            <p class="text-purple-600">AI-Powered ERP Documents Classification</p>
+                        </div>
+                        <div class="space-y-4">
+                            <input
+                                type="text"
+                                id="username"
+                                placeholder="Username"
+                                value="${state.username}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/40 backdrop-blur-sm border border-white/50 text-purple-800 placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            />
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="Password"
+                                value="${state.password}"
+                                class="w-full px-4 py-3 rounded-xl bg-white/40 backdrop-blur-sm border border-white/50 text-purple-800 placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            />
+                            <button
+                                id="loginBtn"
+                                class="w-full py-3 bg-gradient-to-r from-purple-400 to-pink-400 text-white font-bold rounded-xl hover:from-purple-500 hover:to-pink-500 transition-all transform hover:scale-105 shadow-lg"
+                            >Log In
+                            </button>
+                        </div>
+                        <p class="text-purple-500 text-sm text-center mt-4">
+                            Demo: admin / arkeyez2025
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDashboard() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-purple-300 via-pink-200 to-orange-200 p-6">
+                    ${state.notification ? renderNotification() : ''}
+                    
+                    <div class="glassmorphism-light rounded-3xl p-6 mb-6 shadow-2xl">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-purple-700 mb-1">ArkeyzDoc</h1>
+                                <p class="text-purple-600">AI-Powered ERP Documents Classification</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button
+                                    id="modelStatusBtn"
+                                    class="px-4 py-2 bg-gradient-to-r from-blue-300 to-blue-400 text-white font-semibold rounded-xl hover:from-blue-400 hover:to-blue-500 transition-all shadow-md"
+                                >
+                                     Model Status
+                                </button>
+                                <button
+                                    id="apiDocsBtn"
+                                    class="px-4 py-2 bg-gradient-to-r from-green-300 to-emerald-400 text-white font-semibold rounded-xl hover:from-green-400 hover:to-emerald-500 transition-all shadow-md"
+                                >
+                                     API Docs
+                                </button>
+                                <div class="text-right">
+                                    ${renderModelStatus()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="max-w-7xl mx-auto">
+                        ${renderUploadSection()}
+                        ${state.classificationResults ? renderMultiResults() : ''}
+                    </div>
+                </div>
+
+                ${state.modelStatus.showModal ? renderModelStatusModal() : ''}
+            `;
+        }
+
+        function renderNotification() {
+            const isSuccess = state.notification.type === 'success';
+            const bgColor = isSuccess ? 'bg-green-400/30 border-green-500/40' : 'bg-red-400/30 border-red-500/40';
+            const textColor = isSuccess ? 'text-green-800' : 'text-red-800';
+            return `
+                <div class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 glassmorphism-light rounded-2xl p-4 shadow-2xl border ${bgColor} ${textColor} animate-slide-in min-w-[300px] text-center font-semibold">
+                    ${state.notification.message}
+                </div>
+            `;
+        }
+
+        function renderModelStatus() {
+            if (state.modelStatus.loaded) {
+                return `
+                    <div class="flex items-center gap-2 text-purple-700">
+                        <svg class="text-green-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <span class="font-semibold">Model Ready</span>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="text-purple-700">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="animate-spin text-yellow-500" width="20" height="20" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Simulation Mode</span>
+                        </div>
+                        <div class="bg-white/40 rounded-full h-2 w-48">
+                            <div class="bg-gradient-to-r from-yellow-400 to-green-400 h-2 rounded-full transition-all duration-500" style="width: ${state.modelStatus.progress * 100}%"></div>
+                        </div>
+                        <p class="text-xs text-purple-600 mt-1">${Math.round(state.modelStatus.progress * 100)}% loaded</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderModelStatusModal() {
+            const data = state.modelStatus.data;
+            return `
+                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div class="glassmorphism-light rounded-3xl p-6 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-purple-700"> Model Status Details</h2>
+                            <button id="closeModalBtn" class="text-purple-600 hover:text-purple-800 text-3xl font-bold">&times;</button>
+                        </div>
+                        
+                        ${data ? `
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-white/40 rounded-xl p-4">
+                                        <p class="text-purple-600 text-sm font-medium mb-1">System Status</p>
+                                        <p class="text-2xl font-bold text-purple-800">${data.status.toUpperCase()}</p>
+                                    </div>
+                                    <div class="bg-white/40 rounded-xl p-4">
+                                        <p class="text-purple-600 text-sm font-medium mb-1">Mode</p>
+                                        <p class="text-2xl font-bold ${data.model_loaded ? 'text-green-600' : 'text-yellow-600'}">
+                                            ${data.mode.toUpperCase()}
+                                        </p>
+                                    </div>
+                                    <div class="bg-white/40 rounded-xl p-4">
+                                        <p class="text-purple-600 text-sm font-medium mb-1">Test Accuracy</p>
+                                        <p class="text-2xl font-bold text-purple-800">${(data.test_accuracy * 100).toFixed(1)}%</p>
+                                    </div>
+                                    <div class="bg-white/40 rounded-xl p-4">
+                                        <p class="text-purple-600 text-sm font-medium mb-1">Total Predictions</p>
+                                        <p class="text-2xl font-bold text-purple-800">${data.total_predictions}</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/40 rounded-xl p-4">
+                                    <p class="text-purple-700 font-bold mb-3">Model Architecture</p>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div><span class="text-purple-600">Architecture:</span> <span class="font-semibold text-purple-800">${data.model_info.architecture}</span></div>
+                                        <div><span class="text-purple-600">Input Size:</span> <span class="font-semibold text-purple-800">${data.model_info.input_size}</span></div>
+                                        <div><span class="text-purple-600">Classes:</span> <span class="font-semibold text-purple-800">${data.model_info.num_classes}</span></div>
+                                        <div><span class="text-purple-600">Parameters:</span> <span class="font-semibold text-purple-800">${data.model_info.total_parameters}</span></div>
+                                    </div>
+                                </div>
+
+                                ${!data.model_loaded ? `
+                                    <div class="bg-yellow-300/30 border border-yellow-400/40 rounded-xl p-4">
+                                        <p class="text-yellow-800 font-bold mb-2">⚠️ Simulation Mode Active</p>
+                                        <p class="text-yellow-700 text-sm">
+                                            The model file is not loaded. Classification uses mock predictions for demonstration.
+                                        </p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : '<p class="text-purple-600">Loading status data...</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderUploadSection() {
+            return `
+                <div class="glassmorphism-light rounded-3xl p-6 shadow-2xl mb-6">
+                    <h2 class="text-2xl font-bold text-purple-700 mb-4">Upload Documents</h2>
+                    <p class="text-purple-600 text-sm mb-4"></p>
+                    
+                    <div id="dropZone" class="border-2 border-dashed border-purple-300 rounded-2xl p-8 text-center cursor-pointer hover:border-purple-400 hover:bg-white/20 transition-all">
+                        ${state.imagePreviews.length > 0 ? `
+                            <div class="grid grid-cols-4 gap-3 mb-3">
+                                ${state.imagePreviews.slice(0, 8).map(preview => `
+                                    <img src="${preview}" alt="Preview" class="rounded-lg shadow-md w-full h-24 object-cover" />
+                                `).join('')}
+                            </div>
+                            ${state.imagePreviews.length > 8 ? `<p class="text-purple-600 text-sm mb-2">+${state.imagePreviews.length - 8} more files</p>` : ''}
+                        ` : ''}
+                        <p class="text-purple-700 font-semibold mb-2">
+                            ${state.uploadedFiles.length > 0 ? `${state.uploadedFiles.length} file(s) selected` : 'Click to upload or drag & drop'}
+                        </p>
+                        <p class="text-purple-500 text-sm">PNG, JPG, JPEG, PDF (max 10MB each)</p>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*,application/pdf" multiple class="hidden" />
+
+                    ${state.uploadedFiles.length > 0 ? `
+                        <button
+                            id="classifyBtn"
+                            ${state.isClassifying ? 'disabled' : ''}
+                            class="w-full mt-4 py-3 bg-gradient-to-r from-blue-400 to-purple-400 text-white font-bold rounded-xl hover:from-blue-500 hover:to-purple-500 transition-all transform hover:scale-105 disabled:opacity-50 shadow-lg"
+                        >
+                            ${state.isClassifying ? '⏳ Classifying...' : 'Classify All Documents'}
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderMultiResults() {
+            const results = state.classificationResults;
+            return `
+                <div class="glassmorphism-light rounded-3xl p-6 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-purple-700">Classification Results</h2>
+                        <div class="flex items-center gap-3">
+                            <span class="text-purple-600 font-semibold">${results.total_files} file(s) • ${results.total_pages} page(s)</span>
+                            <button
+                                id="insertAllBtn"
+                                ${state.insertingAll ? 'disabled' : ''}
+                                class="px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-400 text-white font-bold rounded-xl hover:from-green-500 hover:to-emerald-500 transition-all transform hover:scale-105 disabled:opacity-50 shadow-md"
+                            >
+                                ${state.insertingAll ? '⏳ Inserting...' : 'Insert All to ERPNext'}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${results.is_simulation ? `
+                        <div class="bg-yellow-300/30 border border-yellow-400/40 rounded-xl p-3 mb-4 text-yellow-800 text-sm font-medium">
+                            ⚠️ Simulation mode active - results are for demonstration
+                        </div>
+                    ` : ''}
+
+                    <div class="space-y-6">
+                        ${results.results.map((result, idx) => `
+                            <div class="result-card bg-white/30 rounded-2xl p-6 shadow-lg">
+                                <div class="flex gap-6">
+                                    <!-- Image Preview -->
+                                    <div class="flex-shrink-0">
+                                        <img 
+                                            src="${result.image_base64}" 
+                                            alt="${result.filename}" 
+                                            class="rounded-xl shadow-md object-cover"
+                                            style="width: 300px; height: 300px;"
+                                        />
+                                    </div>
+
+                                    <!-- Classification Details -->
+                                    <div class="flex-1">
+                                        <div class="mb-4">
+                                            <h3 class="text-lg font-bold text-purple-700 mb-1">📄 ${result.filename}</h3>
+                                            ${result.page_number ? `<span class="text-purple-500 text-sm">Page ${result.page_number}</span>` : ''}
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-3 mb-4">
+                                            <div class="bg-purple-200/40 rounded-lg p-3">
+                                                <p class="text-purple-600 text-xs mb-1 font-medium">Document Class</p>
+                                                <p class="text-purple-800 font-bold text-xl">${result.document_class}</p>
+                                            </div>
+                                            <div class="bg-purple-200/40 rounded-lg p-3">
+                                                <p class="text-purple-600 text-xs mb-1 font-medium">Confidence</p>
+                                                <p class="text-purple-800 font-bold text-xl">${(result.confidence * 100).toFixed(1)}%</p>
+                                            </div>
+                                        </div>
+
+                                        ${result.keywords.length > 0 ? `
+                                            <div class="mb-4">
+                                                <p class="text-purple-600 text-sm mb-2 font-medium">🏷️ Keywords</p>
+                                                <div class="flex flex-wrap gap-2">
+                                                    ${result.keywords.slice(0, 5).map(kw => `
+                                                        <span class="px-3 py-1 bg-purple-200/50 rounded-full text-purple-700 text-sm font-medium">${kw}</span>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        ` : ''}
+
+                                        <div class="mb-4">
+                                            <p class="text-purple-600 text-sm mb-2 font-medium">📝 Summary</p>
+                                            <p class="text-purple-700 text-sm">${result.summary}</p>
+                                        </div>
+
+                                        <!-- Insert Button -->
+                                        <button
+                                            class="insert-btn w-full py-3 bg-gradient-to-r from-green-400 to-emerald-400 text-white font-bold rounded-xl hover:from-green-500 hover:to-emerald-500 transition-all transform hover:scale-105 shadow-md disabled:opacity-50"
+                                            data-index="${idx}"
+                                            ${state.insertingIndex === idx ? 'disabled' : ''}
+                                        >
+                                            ${state.insertingIndex === idx ? '⏳ Inserting...' : 'Insert to ERPNext'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <p class="text-purple-500 text-xs text-center mt-6">Timestamp: ${new Date(results.timestamp).toLocaleString()}</p>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            if (!state.token) {
+                document.getElementById('loginBtn')?.addEventListener('click', handleLogin);
+                document.getElementById('username')?.addEventListener('input', (e) => {
+                    state.username = e.target.value;
+                });
+                document.getElementById('password')?.addEventListener('input', (e) => {
+                    state.password = e.target.value;
+                });
+                document.getElementById('password')?.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+            } else {
+                document.getElementById('dropZone')?.addEventListener('click', () => {
+                    document.getElementById('fileInput').click();
+                });
+                document.getElementById('fileInput')?.addEventListener('change', handleFileSelect);
+                document.getElementById('classifyBtn')?.addEventListener('click', handleClassify);
+                document.getElementById('insertAllBtn')?.addEventListener('click', handleInsertAll);
+                document.getElementById('modelStatusBtn')?.addEventListener('click', handleModelStatusClick);
+                document.getElementById('apiDocsBtn')?.addEventListener('click', handleApiDocsClick);
+                document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+                    state.modelStatus.showModal = false;
+                    render();
+                });
+
+                // Individual insert buttons
+                document.querySelectorAll('.insert-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.getAttribute('data-index'));
+                        handleInsertSingle(index);
+                    });
+                });
+            }
+        }
+
+        async function handleLogin() {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: state.username, password: state.password })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    state.token = data.access_token;
+                    state.notificationShown = false;
+                    
+                    render();
+                } else {
+                    showNotification('❌ Invalid credentials', 'error');
+                }
+            } catch (err) {
+                showNotification('❌ Connection error', 'error');
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                state.uploadedFiles = files;
+                state.classificationResults = null;
+                state.imagePreviews = [];
+                
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            state.imagePreviews.push(e.target.result);
+                            render();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                render();
+            }
+        }
+
+        async function handleClassify() {
+            if (state.uploadedFiles.length === 0) return;
+            
+            state.isClassifying = true;
+            render();
+
+            const formData = new FormData();
+            state.uploadedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+
+            try {
+                const res = await fetch(`${API_URL}/api/v1/classify-multi`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${state.token}` },
+                    body: formData
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    state.classificationResults = data;
+                    //showNotification(`✅ Successfully classified ${data.total_files} file(s) with ${data.total_pages} page(s)!`);
+                } else {
+                    showNotification('❌ Classification failed', 'error');
+                }
+            } catch (err) {
+                showNotification('❌ Classification error', 'error');
+            } finally {
+                state.isClassifying = false;
+                render();
+            }
+        }
+
+        async function handleInsertSingle(index) {
+            const result = state.classificationResults.results[index];
+            state.insertingIndex = index;
+            render();
+
+            try {
+                const res = await fetch(`${API_URL}/api/v1/erpnext/insert`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        document_class: result.document_class,
+                        filename: result.filename,
+                        confidence_score: result.confidence,
+                        keywords: result.keywords,
+                        summary: result.summary,
+                        ocr_text: result.ocr_text
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showNotification(`✅ Document successfully inserted into '${result.document_class}' table ERPNext`);
+                } else {
+                    showNotification('❌ Insert failed', 'error');
+                }
+            } catch (err) {
+                showNotification('❌ Insert error', 'error');
+            } finally {
+                state.insertingIndex = null;
+                render();
+            }
+        }
+
+        async function handleInsertAll() {
+            state.insertingAll = true;
+
+
+
+
+            
+            render();
+
+            const docs = state.classificationResults.results.map(result => ({
+                document_class: result.document_class,
+                filename: result.filename,
+                confidence_score: result.confidence,
+                keywords: result.keywords,
+                summary: result.summary,
+                ocr_text: result.ocr_text
+            }));
+
+            try {
+                const res = await fetch(`${API_URL}/api/v1/erpnext/insert-bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(docs)
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showNotification(`✅ ${data.message}`);
+                } else {
+                    showNotification('❌ Bulk insert failed', 'error');
+                }
+            } catch (err) {
+                showNotification('❌ Bulk insert error', 'error');
+            } finally {
+                state.insertingAll = false;
+                render();
+            }
+        }
+
+        async function handleModelStatusClick() {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/statuts`);
+                const data = await res.json();
+                state.modelStatus.data = data;
+                state.modelStatus.showModal = true;
+                render();
+            } catch (err) {
+                showNotification('❌ Failed to fetch model status', 'error');
+            }
+        }
+
+        function handleApiDocsClick() {
+            window.open(`${API_URL}/api/v1/docs`, '_blank');
+        }
+
+        async function checkModelStatus() {
+            try {
+                const res = await fetch(`${API_URL}/api/v1/status`);
+                const data = await res.json();
+                state.modelStatus = {
+                    ...state.modelStatus,
+                    loaded: data.model_loaded,
+                    progress: data.load_progress,
+                    mode: data.mode
+                };
+                render();
+            } catch (err) {
+                console.error('Status check failed:', err);
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            if (!state.notificationShown) {
+                state.notification = { message, type };
+                state.notificationShown = true;
+                render();
+                setTimeout(() => {
+                    state.notification = null;
+                    state.notificationShown = false;
+                    render();
+                }, 5000);
+            }
+        }
+
+        // Initialize
+        render();
+        setInterval(() => {
+            if (state.token) {
+                checkModelStatus();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
