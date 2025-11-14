@@ -5,66 +5,66 @@
 [![ERPNext](https://img.shields.io/badge/ERPNext-Integration-blue?style=flat)](https://erpnext.com/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python)](https://www.python.org/)
 
-> **Système intelligent de classification de documents basé sur CNN + OCR/NLP**, avec intégration native ERPNext et streaming temps réel WebSocket.
+> **Intelligent document classification system based on CNN + OCR/NLP**, with native ERPNext integration and real-time WebSocket streaming.
 
 ---
 
-## 📋 Table des Matières
+## 📋 Table of Contents
 
-- [Vue d'ensemble](#-vue-densemble)
-- [Fonctionnalités](#-fonctionnalités)
+- [Overview](#-overview)
+- [Features](#-features)
 - [Architecture](#-architecture)
 - [Installation](#-installation)
-- [Configuration ERPNext](#-configuration-erpnext)
-- [Utilisation](#-utilisation)
+- [ERPNext Configuration](#-erpnext-configuration)
+- [Usage](#-usage)
 - [API Documentation](#-api-documentation)
-- [Structure du Projet](#-structure-du-projet)
-- [Déploiement](#-déploiement)
+- [Project Structure](#-project-structure)
+- [Deployment](#-deployment)
 - [Troubleshooting](#-troubleshooting)
 
 ---
 
-## 🎯 Vue d'ensemble
+## 🎯 Overview
 
-**ArkeyezDoc** est un système d'IA qui classifie automatiquement les documents (factures, dessins techniques, rapports, reçus) en utilisant :
+**ArkeyezDoc** is an AI system that automatically classifies documents (invoices, technical drawings, reports, receipts) using:
 
-- **CNN (ResNet50)** : Classification visuelle par deep learning
-- **OCR (EasyOCR)** : Extraction de texte multilingue (FR/EN)
-- **NLP** : Analyse sémantique et extraction de mots-clés
-- **Fusion CNN+OCR** : Combinaison intelligente pour boost de précision
-- **ERPNext Integration** : Insertion directe dans ERPNext via REST API
-- **WebSocket Streaming** : Suivi en temps réel du traitement
+- **CNN (ResNet50)**: Visual classification through deep learning
+- **OCR (EasyOCR)**: Multilingual text extraction (FR/EN)
+- **NLP**: Semantic analysis and keyword extraction
+- **CNN+OCR Fusion**: Intelligent combination for accuracy boost
+- **ERPNext Integration**: Direct insertion into ERPNext via REST API
+- **WebSocket Streaming**: Real-time processing tracking
 
-### 📊 Performances
+### 📊 Performance
 
-| Métrique | Valeur |
-|----------|--------|
+| Metric | Value |
+|--------|-------|
 | **Accuracy** | 85-92% |
-| **Classes supportées** | 4 (Invoice, Drawing, Report, Receipt) |
-| **Temps de traitement** | ~2-3s par document |
-| **Formats supportés** | PDF, JPG, PNG |
+| **Supported Classes** | 4 (Invoice, Drawing, Report, Receipt) |
+| **Processing Time** | ~2-3s per document |
+| **Supported Formats** | PDF, JPG, PNG |
 
 ---
 
-## ✨ Fonctionnalités
+## ✨ Features
 
 ### 🔥 Core Features
 
-- ✅ **Classification multi-documents** : Traitement par batch (PDF multi-pages supporté)
-- ✅ **Fusion CNN+OCR** : Boost de confiance jusqu'à +8% grâce à l'analyse textuelle
-- ✅ **ERPNext Native** : Insertion directe dans le DocType `AI_Document`
-- ✅ **WebSocket Real-time** : Suivi progressif (0% → 100%) avec étapes détaillées
-- ✅ **Authentication JWT** : API sécurisée avec tokens Bearer
-- ✅ **Dashboard Web** : Interface utilisateur moderne et responsive
-- ✅ **API REST complète** : Swagger UI intégré
+- ✅ **Multi-document Classification**: Batch processing (multi-page PDF supported)
+- ✅ **CNN+OCR Fusion**: Confidence boost up to +8% through textual analysis
+- ✅ **ERPNext Native**: Direct insertion into `AI_Document` DocType
+- ✅ **WebSocket Real-time**: Progressive tracking (0% → 100%) with detailed steps
+- ✅ **JWT Authentication**: Secured API with Bearer tokens
+- ✅ **Web Dashboard**: Modern and responsive user interface
+- ✅ **Complete REST API**: Integrated Swagger UI
 
-### 🔧 Fonctionnalités Avancées
+### 🔧 Advanced Features
 
-- 🔄 **Détection de doublons** : Hash SHA-256 pour éviter les duplications
-- 📈 **Statistiques en temps réel** : Nombre de documents par classe, confiance moyenne
-- 🐛 **Debug Endpoints** : Diagnostics modèle et connexion ERPNext
-- 🔐 **Sécurité** : Support du chiffrement de documents sensibles
-- 📝 **Extraction de métadonnées** : Dates, montants, références automatiquement détectés
+- 🔄 **Duplicate Detection**: SHA-256 hash to prevent duplications
+- 📈 **Real-time Statistics**: Document count per class, average confidence
+- 🐛 **Debug Endpoints**: Model and ERPNext connection diagnostics
+- 🔐 **Security**: Support for sensitive document encryption
+- 📝 **Metadata Extraction**: Automatic detection of dates, amounts, references
 
 ---
 
@@ -94,135 +94,135 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 📦 Composants
+### 📦 Components
 
-| Composant | Technologie | Rôle |
-|-----------|-------------|------|
-| **Backend API** | FastAPI | Orchestration générale |
-| **Model Manager** | TensorFlow/Keras | Chargement & inférence CNN |
-| **OCR Pipeline** | EasyOCR | Extraction de texte |
-| **NLP Engine** | TF-IDF | Extraction keywords |
-| **ERPNext Connector** | Requests | Communication REST avec ERPNext |
-| **WebSocket Manager** | FastAPI WebSocket | Streaming temps réel |
-| **Database** | SQLite (local) / ERPNext | Stockage documents |
+| Component | Technology | Role |
+|-----------|------------|------|
+| **Backend API** | FastAPI | General orchestration |
+| **Model Manager** | TensorFlow/Keras | CNN loading & inference |
+| **OCR Pipeline** | EasyOCR | Text extraction |
+| **NLP Engine** | TF-IDF | Keyword extraction |
+| **ERPNext Connector** | Requests | REST communication with ERPNext |
+| **WebSocket Manager** | FastAPI WebSocket | Real-time streaming |
+| **Database** | SQLite (local) / ERPNext | Document storage |
 
 ---
 
 ## 📥 Installation
 
-### 1️⃣ Prérequis
+### 1️⃣ Prerequisites
 
 - **Python 3.10+**
-- **ERPNext v14+** (serveur local ou distant)
-- **4GB RAM minimum** (8GB recommandé pour le modèle)
+- **ERPNext v14+** (local or remote server)
+- **4GB RAM minimum** (8GB recommended for model)
 - **Git**
 
-### 2️⃣ Cloner le Repository
+### 2️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext.git
 cd CNN-Fastapi-ERPnext
 ```
 
-### 3️⃣ Créer l'Environnement Virtuel
+### 3️⃣ Create Virtual Environment
 
 ```bash
-# Créer l'environnement
+# Create environment
 python -m venv env
 
-# Activer (Windows)
+# Activate (Windows)
 env\Scripts\activate
 
-# Activer (Linux/Mac)
+# Activate (Linux/Mac)
 source env/bin/activate
 ```
 
-### 4️⃣ Installer les Dépendances
+### 4️⃣ Install Dependencies
 
 ```bash
 pip install --upgrade pip
 pip install -r backend/requirements.txt
 ```
 
-### 5️⃣ Configuration du Modèle
+### 5️⃣ Model Configuration
 
-Placez votre modèle CNN dans le dossier `models/` :
+Place your CNN model in the `models/` folder:
 
 ```bash
 models/
-└── final_model_complete.h5  # Votre modèle entraîné
+└── final_model_complete.h5  # Your trained model
 ```
 
-> ⚠️ **Important** : Le modèle doit être au format `.h5` et compatible TensorFlow 2.15
+> ⚠️ **Important**: Model must be in `.h5` format and compatible with TensorFlow 2.15
 
 ---
 
-## 🔧 Configuration ERPNext
+## 🔧 ERPNext Configuration
 
-### Étape 1 : Lancer le Script de Setup
+### Step 1: Run Setup Script
 
 ```bash
 cd backend
 python erpnext_setup.py
 ```
 
-Ce script va :
-1. ✅ Créer le DocType `AI_Document` dans ERPNext
-2. ✅ Générer les API credentials (API Key + Secret)
-3. ✅ Tester la connexion avec un document de test
+This script will:
+1. ✅ Create the `AI_Document` DocType in ERPNext
+2. ✅ Generate API credentials (API Key + Secret)
+3. ✅ Test connection with a test document
 
-### Étape 2 : Configurer les Variables d'Environnement
+### Step 2: Configure Environment Variables
 
-Créez un fichier `.env` dans le dossier `backend/` :
+Create a `.env` file in the `backend/` folder:
 
 ```bash
 # backend/.env
 ERPNEXT_URL=http://localhost:8080
-ERPNEXT_API_KEY=votre_api_key_generee
-ERPNEXT_API_SECRET=votre_api_secret_genere
+ERPNEXT_API_KEY=your_generated_api_key
+ERPNEXT_API_SECRET=your_generated_api_secret
 ```
 
-> 💡 **Astuce** : Les credentials sont affichés à la fin du script `erpnext_setup.py`
+> 💡 **Tip**: Credentials are displayed at the end of the `erpnext_setup.py` script
 
-### Structure du DocType `AI_Document`
+### `AI_Document` DocType Structure
 
-| Champ | Type | Description |
+| Field | Type | Description |
 |-------|------|-------------|
-| `filename` | Data | Nom du fichier (clé unique) |
+| `filename` | Data | File name (unique key) |
 | `document_class` | Select | Invoice/Drawing/Report/Receipt |
-| `file_hash` | Data | SHA-256 hash (détection doublons) |
-| `confidence_score` | Float | Score de confiance (0-1) |
-| `keywords` | Small Text | Mots-clés extraits |
-| `summary` | Long Text | Résumé de la classification |
-| `ocr_text` | Long Text | Texte extrait par OCR |
-| `uploaded_by` | Link (User) | Utilisateur |
-| `upload_date` | Datetime | Date d'upload |
-| `is_encrypted` | Check | Document chiffré ? |
+| `file_hash` | Data | SHA-256 hash (duplicate detection) |
+| `confidence_score` | Float | Confidence score (0-1) |
+| `keywords` | Small Text | Extracted keywords |
+| `summary` | Long Text | Classification summary |
+| `ocr_text` | Long Text | OCR extracted text |
+| `uploaded_by` | Link (User) | User |
+| `upload_date` | Datetime | Upload date |
+| `is_encrypted` | Check | Encrypted document? |
 
 ---
 
-## 🚀 Utilisation
+## 🚀 Usage
 
-### Démarrer le Serveur
+### Start Server
 
 ```bash
 cd backend
 python main.py
 ```
 
-Le serveur démarre sur **http://127.0.0.1:8000**
+Server starts on **http://127.0.0.1:8000**
 
-### Accéder aux Interfaces
+### Access Interfaces
 
 | Interface | URL | Description |
 |-----------|-----|-------------|
-| **Dashboard** | http://127.0.0.1:8000/ | Interface utilisateur |
-| **API Docs** | http://127.0.0.1:8000/api/v1/docs | Documentation Swagger |
-| **Health Check** | http://127.0.0.1:8000/api/v1/health | Status de l'API |
+| **Dashboard** | http://127.0.0.1:8000/ | User interface |
+| **API Docs** | http://127.0.0.1:8000/api/v1/docs | Swagger documentation |
+| **Health Check** | http://127.0.0.1:8000/api/v1/health | API status |
 
-### 🔐 Authentification
+### 🔐 Authentication
 
-1. **Login** via l'API :
+1. **Login** via API:
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/api/v1/login" \
@@ -230,7 +230,7 @@ curl -X POST "http://127.0.0.1:8000/api/v1/login" \
   -d '{"username": "admin", "password": "arkeyez2025"}'
 ```
 
-Réponse :
+Response:
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
@@ -239,7 +239,7 @@ Réponse :
 }
 ```
 
-2. **Utiliser le token** pour les requêtes :
+2. **Use token** for requests:
 
 ```bash
 curl -X GET "http://127.0.0.1:8000/api/v1/status" \
@@ -250,33 +250,33 @@ curl -X GET "http://127.0.0.1:8000/api/v1/status" \
 
 ## 📡 API Documentation
 
-### Endpoints Principaux
+### Main Endpoints
 
-#### 1️⃣ Classification de Documents
+#### 1️⃣ Document Classification
 
 **POST** `/api/v1/classify-multi`
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/api/v1/classify-multi" \
   -H "Authorization: Bearer YOUR_TOKEN" \
-  -F "files=@facture.pdf" \
-  -F "files=@dessin.jpg"
+  -F "files=@invoice.pdf" \
+  -F "files=@drawing.jpg"
 ```
 
-**Response :**
+**Response:**
 ```json
 {
   "results": [
     {
-      "filename": "facture.pdf - Page 1",
+      "filename": "invoice.pdf - Page 1",
       "document_class": "Invoice",
       "confidence": 0.92,
       "cnn_confidence": 0.89,
       "ocr_boost": 0.03,
       "fusion_applied": true,
-      "keywords": ["facture", "montant", "total", "tva", "client"],
+      "keywords": ["invoice", "amount", "total", "tax", "client"],
       "summary": "Page 1: Invoice (92.0%) [Fusion: +3.0%]",
-      "ocr_text": "FACTURE N° 2024-001...",
+      "ocr_text": "INVOICE N° 2024-001...",
       "page_number": 1,
       "image_base64": "data:image/jpeg;base64,/9j/4AAQ..."
     }
@@ -289,7 +289,7 @@ curl -X POST "http://127.0.0.1:8000/api/v1/classify-multi" \
 }
 ```
 
-#### 2️⃣ Insertion dans ERPNext
+#### 2️⃣ Insert into ERPNext
 
 **POST** `/api/v1/erpnext/insert`
 
@@ -298,31 +298,31 @@ curl -X POST "http://127.0.0.1:8000/api/v1/erpnext/insert" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "filename": "facture_2024_001.pdf",
+    "filename": "invoice_2024_001.pdf",
     "document_class": "Invoice",
     "confidence_score": 0.92,
-    "keywords": ["facture", "total"],
+    "keywords": ["invoice", "total"],
     "summary": "Invoice (92%)",
-    "ocr_text": "FACTURE...",
+    "ocr_text": "INVOICE...",
     "uploaded_by": "Administrator"
   }'
 ```
 
-**Response :**
+**Response:**
 ```json
 {
   "success": true,
   "message": "Document successfully inserted into ERPNext",
-  "inserted_id": "facture_2024_001.pdf",
-  "erpnext_name": "facture_2024_001.pdf"
+  "inserted_id": "invoice_2024_001.pdf",
+  "erpnext_name": "invoice_2024_001.pdf"
 }
 ```
 
-#### 3️⃣ Historique des Documents
+#### 3️⃣ Document History
 
 **GET** `/api/v1/erpnext/history?limit=50`
 
-#### 4️⃣ Statistiques
+#### 4️⃣ Statistics
 
 **GET** `/api/v1/erpnext/stats`
 
@@ -350,14 +350,14 @@ curl -X POST "http://127.0.0.1:8000/api/v1/erpnext/insert" \
 ```javascript
 const ws = new WebSocket('ws://127.0.0.1:8000/ws/classify');
 
-// Envoyer une image
+// Send image
 ws.send(JSON.stringify({
   type: "classify",
   image: "data:image/jpeg;base64,/9j/4AAQ...",
   filename: "document.jpg"
 }));
 
-// Recevoir les updates
+// Receive updates
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   
@@ -371,58 +371,58 @@ ws.onmessage = (event) => {
 
 ---
 
-## 📂 Structure du Projet
+## 📂 Project Structure
 
 ```
 CNN-Fastapi-ERPnext/
 ├── backend/
-│   ├── main.py                 # FastAPI application principale
+│   ├── main.py                 # Main FastAPI application
 │   ├── models.py               # ModelManager (CNN)
-│   ├── database.py             # DatabaseManager (SQLite local)
+│   ├── database.py             # DatabaseManager (local SQLite)
 │   ├── auth.py                 # JWT authentication
 │   ├── ocr_nlp.py              # OCR + NLP pipeline
 │   ├── erpnext_connector.py    # ERPNext REST API client
-│   ├── erpnext_setup.py        # Script de configuration ERPNext
+│   ├── erpnext_setup.py        # ERPNext configuration script
 │   ├── middleware.py           # Request logging
-│   ├── requirements.txt        # Dependencies Python
+│   ├── requirements.txt        # Python dependencies
 │   ├── .env                    # Configuration (git ignored)
-│   └── archive.db              # Base locale (fallback)
+│   └── archive.db              # Local database (fallback)
 ├── frontend/
-│   ├── dashboard.html          # Dashboard principal
-│   ├── styles.css              # Styles CSS
-│   └── script.js               # Logique JavaScript
+│   ├── dashboard.html          # Main dashboard
+│   ├── styles.css              # CSS styles
+│   └── script.js               # JavaScript logic
 ├── models/
-│   └── final_model_complete.h5 # Modèle CNN entraîné
-├── dataset/                    # Dataset d'entraînement (optionnel)
-├── output/                     # Outputs de tests
-├── README.md                   # Ce fichier
+│   └── final_model_complete.h5 # Trained CNN model
+├── dataset/                    # Training dataset (optional)
+├── output/                     # Test outputs
+├── README.md                   # This file
 └── .gitignore
 ```
 
 ---
 
-## 🐳 Déploiement
+## 🐳 Deployment
 
-### Option 1 : Serveur Linux (Ubuntu)
+### Option 1: Linux Server (Ubuntu)
 
 ```bash
-# Installer Python 3.10+
+# Install Python 3.10+
 sudo apt update
 sudo apt install python3.10 python3-pip
 
-# Cloner et installer
+# Clone and install
 git clone https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext.git
 cd CNN-Fastapi-ERPnext/backend
 pip3 install -r requirements.txt
 
-# Configurer .env
+# Configure .env
 nano .env
 
-# Lancer avec systemd
+# Launch with systemd
 sudo nano /etc/systemd/system/arkeyezdoc.service
 ```
 
-**Fichier service :**
+**Service file:**
 ```ini
 [Unit]
 Description=ArkeyezDoc API
@@ -444,59 +444,59 @@ sudo systemctl start arkeyezdoc
 sudo systemctl enable arkeyezdoc
 ```
 
-### Option 2 : Docker (à venir)
+### Option 2: Docker (Coming Soon)
 
 ---
 
 ## 🐛 Troubleshooting
 
-### ❌ Problème : "ERPNext not connected"
+### ❌ Problem: "ERPNext not connected"
 
-**Solution :**
-1. Vérifier que ERPNext est accessible : `curl http://localhost:8080`
-2. Vérifier les credentials dans `.env`
-3. Tester la connexion : `GET /api/v1/debug/erpnext`
+**Solution:**
+1. Verify ERPNext is accessible: `curl http://localhost:8080`
+2. Check credentials in `.env`
+3. Test connection: `GET /api/v1/debug/erpnext`
 
-### ❌ Problème : "Model loading timeout"
+### ❌ Problem: "Model loading timeout"
 
-**Solution :**
-1. Vérifier que le fichier `.h5` existe : `ls -lh models/`
-2. Vérifier la RAM disponible : `free -h`
-3. Le mode simulation s'active automatiquement si échec
+**Solution:**
+1. Verify `.h5` file exists: `ls -lh models/`
+2. Check available RAM: `free -h`
+3. Simulation mode activates automatically on failure
 
-### ❌ Problème : "OCR not available"
+### ❌ Problem: "OCR not available"
 
-**Solution :**
+**Solution:**
 ```bash
 pip install easyocr opencv-python-headless
 ```
 
-### ❌ Problème : WebSocket déconnecté
+### ❌ Problem: WebSocket disconnected
 
-**Solution :**
-1. Vérifier les CORS dans `main.py`
-2. Utiliser `ws://` (pas `wss://`) en local
-3. Vérifier les logs : `/api/v1/debug/model`
+**Solution:**
+1. Check CORS in `main.py`
+2. Use `ws://` (not `wss://`) locally
+3. Check logs: `/api/v1/debug/model`
 
 ---
 
 ## 📝 Changelog
 
 ### v2.0.0 (2025-11-14)
-- ✨ Intégration ERPNext native
-- ✨ WebSocket streaming temps réel
-- ✨ Fusion CNN + OCR/NLP
-- 🐛 Fix: Chargement asynchrone du modèle
-- 📚 Documentation complète
+- ✨ Native ERPNext integration
+- ✨ Real-time WebSocket streaming
+- ✨ CNN + OCR/NLP fusion
+- 🐛 Fix: Asynchronous model loading
+- 📚 Complete documentation
 
 ### v1.0.0 (2024)
-- 🎉 Version initiale
-- ✅ Classification CNN basique
-- ✅ API REST
+- 🎉 Initial release
+- ✅ Basic CNN classification
+- ✅ REST API
 
 ---
 
-## 👥 Auteurs
+## 👥 Authors
 
 - **Yosra Megbli** - [@Yosra-Megbli](https://github.com/Yosra-Megbli)
 
@@ -504,29 +504,29 @@ pip install easyocr opencv-python-headless
 
 ## 📄 License
 
-MIT License - Voir [LICENSE](LICENSE) pour détails
+MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
-## 🙏 Remerciements
+## 🙏 Acknowledgments
 
-- **ERPNext** : Framework ERP open-source
-- **FastAPI** : Framework web moderne
-- **TensorFlow** : Deep learning
-- **EasyOCR** : OCR open-source
+- **ERPNext**: Open-source ERP framework
+- **FastAPI**: Modern web framework
+- **TensorFlow**: Deep learning
+- **EasyOCR**: Open-source OCR
 
 ---
 
 ## 📞 Support
 
-- 🐛 **Issues** : [GitHub Issues](https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext/issues)
-- 📧 **Email** : support@arkeyezdoc.com
-- 💬 **Discord** : [Rejoindre le serveur](#)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext/issues)
+- 📧 **Email**: support@arkeyezdoc.com
+- 💬 **Discord**: [Join Server](#)
 
 ---
 
 <div align="center">
   <strong>Made with ❤️ by Yosra Megbli</strong>
   <br><br>
-  <a href="https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext">⭐ Star ce projet</a>
+  <a href="https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext">⭐ Star this project</a>
 </div>
