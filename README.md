@@ -508,7 +508,7 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **ERPNext**: Open-source ERP framework
 - **FastAPI**: Modern web framework
@@ -517,11 +517,6 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
-## 📞 Support
-
-- 🐛 **Issues**: [GitHub Issues](https://github.com/Yosra-Megbli/CNN-Fastapi-ERPnext/issues)
-- 📧 **Email**: support@arkeyezdoc.com
-- 💬 **Discord**: [Join Server](#)
 
 ---
 
