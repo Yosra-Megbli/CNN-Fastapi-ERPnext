@@ -458,11 +458,7 @@ pip install easyocr opencv-python-headless
 
 ---
 
-## License
 
-MIT License - See LICENSE for details
-
----
 
 ## Acknowledgments
 
